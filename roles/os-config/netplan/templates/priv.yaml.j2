@@ -1,0 +1,24 @@
+network:
+  renderer: NetworkManager
+  ethernets:
+    {{up_link}}:
+      critical: true
+      dhcp4: false
+      dhcp6: false
+      match:
+        macaddress: {{up_link_mac}}
+
+  vlans:
+    vlan{{vlan_id}}:
+      id: {{vlan_id}}
+      link: {{up_link}}
+      mtu: {{vlan_mtu|d(1400)}}
+      addresses:
+         - {{ip_vlan}}/24
+{% if vlan_routes is defined %}
+      routes:
+{% for route in  vlan_routes  %}
+        - to: {{route.to}}
+          via: {{route.via}}
+{% endfor %}
+{% endif %}

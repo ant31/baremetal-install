@@ -1,0 +1,54 @@
+---
+- name: create a user admin user
+  user:
+    name: "{{admin_user | default('kadmin')}}"
+    state: present
+    group: sudo
+    shell: /bin/bash
+    groups:
+      - sudo
+    password: "{{ admin_password|password_hash('sha512') }}"
+    update_password: "{{update_user|d('on_create')}}"
+
+- name: configure bashrc
+  template:
+    src: bashrc
+    dest: /home/{{admin_user | default("kadmin")}}/.bashrc
+
+- name: Set authorized keys taken from url
+  authorized_key:
+    user: "{{item.user}}"
+    state: present
+    key: https://github.com/{{item.github}}.keys
+  loop: "{{sshkeys}}"
+  tags:
+    - sshkeys
+
+- name: Set authorized keys taken from url
+  lineinfile:
+    backup: yes
+    create: no
+    regex: "^(# *)?{{item.key}}"
+    line: "{{item.key}} {{item.value}}"
+    state: present
+    path: "/etc/ssh/sshd_config"
+  loop:
+    - { key: "PermitRootLogin", value: "no" }
+    - { key: "PasswordAuthentication", value: "no" }
+  notify:
+    - restart sshd
+
+- name: restart sshd
+  command: systemctl restart sshd
+  when: restart_sshd|d(false)|bool
+  register: rssh
+  tags:
+    - restart-sshd
+  ignore_errors: true
+
+- name: restart sshd
+  command: systemctl restart ssh
+  when: rssh is failed
+  tags:
+    - restart-ssh
+  ignore_errors: true

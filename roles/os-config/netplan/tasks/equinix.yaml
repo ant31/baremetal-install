@@ -1,0 +1,6 @@
+- name: Configure netplan | Add vlan
+  template:
+    src: equinix.yaml.j2
+    dest: /etc/netplan/z1-equinix-netcfg.yaml
+    backup: true
+  when: "'equinix' in group_names"

@@ -1,0 +1,36 @@
+---
+
+- name: APT | Install packages list
+  apt:
+    upgrade: dist
+  register: dist
+  tags:
+    - apt
+
+- name: APT | Do release-upgrade
+  command: "do-release-upgrade --allow-third-party -m server  -f DistUpgradeViewNonInteractive"
+  tags:
+    - release-upgrade
+  register: upgraded
+  ignore_errors: true
+
+- name: Reboot a slow machine that might have lots of updates to apply
+  reboot:
+    reboot_timeout: 300
+    test_command: date
+  register: rebooted
+  when: upgraded is failed
+
+- name: APT | Do release-upgrade
+  command: "do-release-upgrade --allow-third-party -m server  -f DistUpgradeViewNonInteractive"
+  tags:
+    - release-upgrade
+  when: upgraded is failed
+  register: upgraded2
+
+- name: Reboot a slow machine that might have lots of updates to apply
+  reboot:
+    reboot_timeout: 300
+    test_command: date
+  register: rebooted
+  when: (reboot|d("never")=="always") or ((upgraded is changed or upgrade2 is changed) and (reboot is defined and reboot|d("never")=="onchange"))

@@ -1,0 +1,66 @@
+all:
+  children:
+    equinix:
+      hosts:
+        k4: {}
+        k2: {}
+        k3: {}
+    datacenter_ams:
+      hosts:
+        k4: {}
+        k2: {}
+        k3: {}
+    group_a0:
+      hosts:
+        k4: {}
+    group_a1:
+      hosts:
+        k2: {}
+    group_a2:
+      hosts:
+        k3: {}
+    model_m3large:
+      hosts:
+        k4: {}
+        k2: {}
+        k3: {}
+  hosts:
+    k4:
+      ansible_ssh_host: 147.0.0.4
+      hostname: k4
+      ip: 10.10.10.4
+      ip_vlan: 10.0.6.14
+      model: m3large
+      name: k4
+      region: ams
+      server_info:
+        dc: ams
+        group: a0
+        id: k1
+      zone: ams
+    k2:
+      ansible_ssh_host: 147.0.0.2
+      hostname: k2
+      ip: 10.10.10.2
+      ip_vlan: 10.0.6.12
+      model: m3large
+      name: k2
+      region: ams
+      server_info:
+        dc: ams
+        group: a1
+        id: k2
+      zone: ams
+    k3:
+      ansible_ssh_host: 147.0.0.3
+      hostname: k3
+      ip: 10.10.10.3
+      ip_vlan: 10.0.6.13
+      model: m3large
+      name: k3
+      region: ams
+      server_info:
+        dc: ams
+        group: a2
+        id: k3
+      zone: ams

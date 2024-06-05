@@ -1,0 +1,29 @@
+---
+
+- name: Increase Soft ulimit - wildcard
+  pam_limits:
+    backup: yes
+    domain: "*"
+    limit_item: nofile
+    limit_type: soft
+    value: 10000
+
+- name: Increase Soft ulimit - root
+  pam_limits:
+    backup: yes
+    domain: "root"
+    limit_item: nofile
+    limit_type: soft
+    value: 10000
+
+- name: Inotify max_user_instances limit - root
+  sysctl:
+    name: 'fs.inotify.max_user_instances'
+    value: 2048
+    reload: yes
+
+- name: vm.max_map_count=262144
+  sysctl:
+    name: 'vm.max_map_count'
+    value: 262144
+    reload: yes

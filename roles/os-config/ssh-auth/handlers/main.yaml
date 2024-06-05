@@ -1,0 +1,10 @@
+- name: restart sshd
+  systemd:
+    state: restarted
+    name: sshd
+  ignore_errors: true
+- name: restart sshd
+  systemd:
+    state: restarted
+    name: ssh
+  ignore_errors: true

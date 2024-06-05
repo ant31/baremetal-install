@@ -1,0 +1,278 @@
+;; Emacsen independent startup file.  All of the various installed
+;; flavors of emacs (emacs22, emacs23, xemacs21) will load this file
+;; at startup.  Make sure any code you put here is emacs flavor
+;; independent.
+;; Package maintainers: do not have Debian packages edit this file.
+;; See /usr/share/doc/emacsen-common/debian-emacs-policy.gz for the
+;; proper way to handle Emacs package initialization code.
+
+
+
+					;===========================
+					; Francais
+					;===========================
+
+(set-language-environment "utf-8")
+(set-terminal-coding-system 'utf-8)
+					;(iso-accents-mode t)
+(prefer-coding-system 'utf-8)
+
+					;===========================
+					; delete-trainling-whitespace
+					;===========================
+
+(add-hook 'write-file-hooks 'delete-trailing-whitespace)
+
+					;===========================
+					; Maping for count-lines-region
+					;===========================
+
+(global-set-key "\C-cl" 'count-lines-region)
+
+					;============================
+					; Doxygen
+					;============================
+
+(setq load-path (nconc '("/etc/emacs/emacs.d/") load-path))
+
+
+(add-to-list 'auto-mode-alist '("\\.zsh$" . shell-script-mode))
+(add-to-list 'auto-mode-alist '("\\.ru$" . ruby-mode))
+(add-to-list 'auto-mode-alist '("\\.rake$" . ruby-mode))
+(add-to-list 'auto-mode-alist '("group_vars/.*$" . conf-mode))
+(add-to-list 'magic-mode-alist '("---" . yaml-mode) )
+(add-to-list 'magic-mode-alist '("#conf-mode" . conf-mode) )
+(add-to-list 'auto-mode-alist '("control$" . conf-mode))
+(add-to-list 'auto-mode-alist '("Gemfile$" . ruby-mode))
+(add-to-list 'auto-mode-alist '("\\.rake$" . ruby-mode))
+
+(when (>= emacs-major-version 24)
+  (require 'package)
+  (package-initialize)
+  (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
+  )
+(setq backup-directory-alist `(("." . "~/.emacs-backups")))
+(setq backup-by-copying t)
+(setq delete-old-versions t
+  kept-new-versions 6
+  kept-old-versions 2
+  version-control t)
+
+(transient-mark-mode 1)               ; enabled by default, highligh behavior
+(winner-mode 1)                       ; undo c-left, redo c-right
+(setq x-select-enable-clipboard t)    ; paste from and to emacs
+(setq inhibit-startup-message t)      ; don't show the GNU splash screen
+;(scroll-bar-mode nil)                 ; no scroll bar
+;(menu-bar-mode -1)                    ; no menu bar
+;(tool-bar-mode -1)                    ; no tool bar
+(setq frame-title-format "%b")        ; titlebar shows buffer's name
+	  (global-font-lock-mode t)             ; syntax highlighting
+	  (setq font-lock-maximum-decoration t) ; maximum decoration for all modes
+	  (show-paren-mode t)                   ; show opposing paren while hovering
+	  (setq scroll-step 1)                  ; smooth scrolling
+	  (delete-selection-mode t)             ; typing removes highlighted text
+	  (line-number-mode t)                  ; display line number in modeline
+	  (column-number-mode t)                ; display column number in modeline
+	  (setq display-time-day-and-date t)    ; display date in modeline
+	  (setq display-time-24hr-format t)     ; european 24h format
+	  (display-time)                        ; display time in modeline
+	  (auto-compression-mode t)             ; open compressed files
+;	  (mouse-wheel-mode t)                  ; enable mouse wheel
+	  (fset 'yes-or-no-p 'y-or-n-p)         ; y or n will do
+	  (setq default-major-mode 'text-mode)  ; change default major mode to text
+	  (setq ring-bell-function 'ignore)     ; turn the alarm totally off
+					;(setq-default indent-tabs-mode nil)   ; spaces instead of tabs
+
+
+	  (setq delete-auto-save-files t)       ; delete unnecessary autosave files
+	  (setq delete-old-versions t)          ; delete oldversion file
+	  (setq next-line-add-newlines nil)     ; prevents new line after eof
+
+					; C mode
+
+	  (c-set-offset 'substatement-open 0)   ; change '{' indentation
+	  (c-set-offset 'case-label '+)         ; make each case line indent from switch
+
+					; key bindings
+
+	  (global-set-key [f1] 'help-command)         ; f1 = help
+	  (global-set-key [f2] 'undo)                 ; f2 = undo
+	  (global-set-key [f3] 'ansi-term)               ; f3 = emacs shell
+	  (global-set-key [f4] 'kill-this-buffer)     ; f4 = kill buffer
+	  (global-set-key [f8] 'compile)              ; f7 = compile
+	  (global-set-key [f12] (lambda () (interactive) (manual-entry (current-word))))
+	  (global-set-key [S-right] 'yic-next-buffer) ; alt-right = next buffer
+	  (global-set-key [S-left] 'yic-prev-buffer)  ; alt-left = previous buffer
+
+					; elisp functions
+
+	  (defun yic-ignore (str)
+	    (or
+	     (string-match "\\*Buffer List\\*" str)
+	     (string-match "\\*scratch\\*" str)
+	     (string-match "^TAGS" str)
+	     (string-match "^\\*Messages\\*$" str)
+	     (string-match "^\\*Completions\\*$" str)
+	     (string-match "^ " str)
+	     (memq str
+		   (mapcar
+		    (lambda (x)
+		      (buffer-name
+		       (window-buffer
+			(frame-selected-window x))))
+		    (visible-frame-list)))
+	     ))
+
+	  (defun yic-next (ls)
+	    (let* ((ptr ls)
+		   bf bn go
+		   )
+	      (while (and ptr (null go))
+		(setq bf (car ptr)  bn (buffer-name bf))
+		(if (null (yic-ignore bn))
+		    (setq go bf)
+		  (setq ptr (cdr ptr))
+		  )
+		)
+	      (if go
+		  (switch-to-buffer go))))
+
+	  (defun yic-prev-buffer ()
+	    (interactive)
+	    (yic-next (reverse (buffer-list))))
+
+	  (defun yic-next-buffer ()
+	    (interactive)
+	    (bury-buffer (current-buffer))
+	    (yic-next (buffer-list)))
+
+
+	  (add-hook 'c-mode-hook 'fp-c-mode-routine)
+	  (defun fp-c-mode-routine ()
+	    (local-set-key "\M-q" 'rebox-comment))
+	  (autoload 'rebox-comment "rebox" nil t)
+	  (autoload 'rebox-region "rebox" nil t)
+
+	  (defun do_insert_time ()
+	    (interactive)
+	    (insert-string (current-time-string)))
+
+
+
+
+					; idomode
+
+
+	  (ido-mode t)
+(setq ido-enable-flex-matching t);
+
+	  (require 'uniquify)
+	  (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
+
+					; MEGA GDB
+	  (setq-default gdb-many-windows t)
+
+
+
+	  ;; BINDINGS :: compile
+          (global-set-key [f4] 'flymake-display-err-menu-for-current-line)
+	  (global-set-key [f5] 'flymake-compile)
+	  (global-set-key [f6] 'flymake-goto-prev-error)
+	  (global-set-key [f7] 'flymake-goto-next-error)
+	  (global-set-key [f8] 'previous-error)
+	  (global-set-key [f9] 'next-error)
+	  (global-set-key [f10] 'recompile)
+	  (global-set-key [f11] 'compile)
+	  ;; BINDINGS :: font size
+	  (global-set-key [(control +)] 'inc-font-size)
+	  (global-set-key [(control =)] 'reset-font-size)
+	  ;; BINDINGS :: ido
+	  (global-set-key [(control b)] 'ido-switch-buffer)
+
+;;; =======
+;;; C HOOKS
+;;; =======
+	  ;; add header guard
+	  (defun insert-header-guard ()
+	    (interactive)
+	    (save-excursion
+	      (when (buffer-file-name)
+		(let*
+		    (
+		     (name (file-name-nondirectory buffer-file-name))
+		     (macro (replace-regexp-in-string "\\." "_" (upcase name)))
+		     (macro (replace-regexp-in-string "-" "_" macro))
+		     (macro (concat macro "_"))
+		     )
+		  (goto-char (point-min))
+		  (insert "#ifndef " macro "\n")
+		  (insert "# define " macro "\n\n")
+		  (goto-char (point-max))
+		  (insert "\n#endif /* !" macro " */\n")
+		  )
+		)
+	      )
+	    )
+
+
+	  (add-hook 'find-file-hooks
+		    (lambda ()
+		      (when (and (memq major-mode '(c-mode c++-mode)) (equal (point-min) (point-max)) (string-match ".*\\.hh?" (buffer-file-name)))
+			(insert-header-guard)
+			(goto-line 3)
+			(insert "\n"))))
+	  ;; BINDINGS :: compile
+	  (global-set-key [f8] 'previous-error)
+	  (global-set-key [f9] 'next-error)
+	  (global-set-key [f10] 'recompile)
+	  (global-set-key [f11] 'compile)
+	  ;; BINDINGS :: font size
+					;(global-set-key [(control +)] 'inc-font-size)
+	  (global-set-key [(control =)] 'reset-font-size)
+	  ;; BINDINGS :: ido
+	  (global-set-key [(control b)] 'ido-switch-buffer)
+
+					; Auto insert C/C++ header guard
+	  (add-hook 'find-file-hooks
+		    (lambda ()
+		      (when (and (memq major-mode '(c-mode c++-mode)) (equal (point-min) (point-max)) (string-match ".*\\.hh?" (buffer-file-name)))
+			(insert-header-guard)
+			(goto-line 3)
+			(insert "\n"))))
+
+	  (defun insert-malloc ()
+	    (interactive)
+	    (insert "if (( = malloc(sizeof () * 1)) == NULL)\n")
+	    (insert "  return (NULL);")
+	    )
+	  (global-set-key [(control n)] 'insert-malloc)
+
+
+;;;;;;;;;;;;;;;;; NEW ;;;;;;;;;;;;;;
+;;; PYTHON ;;;
+(setq
+python-shell-interpreter "ipython"
+python-shell-interpreter-args ""
+python-shell-prompt-regexp "In \\[[0-9]+\\]: "
+python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: "
+python-shell-completion-setup-code
+   "from IPython.core.completerlib import module_completion"
+ python-shell-completion-module-string-code
+   "';'.join(module_completion('''%s'''))\n"
+ python-shell-completion-string-code
+   "';'.join(get_ipython().Completer.all_completions('''%s'''))\n")
+
+(require 'python)
+
+;;; YAML ;;;;
+(require 'yaml-mode)
+ (add-to-list 'auto-mode-alist '("\\.yml$" . yaml-mode))
+(add-hook 'yaml-mode-hook
+       '(lambda ()
+        (define-key yaml-mode-map "\C-m" 'newline-and-indent)))
+(put 'scroll-left 'disabled nil)
+(put 'downcase-region 'disabled nil)
+
+;;; LOGSTASH ;;
+(require 'logstash-conf)
+

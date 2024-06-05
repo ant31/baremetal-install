@@ -1,0 +1,51 @@
+---
+- name: install network-manager
+  apt:
+    package:
+      - network-manager
+
+- file:
+    path: "{{item}}"
+    state: absent
+  loop:
+    # - /run/netplan/{{up_link}}.yaml
+    # - /run/net-{{up_link}}.conf
+    # - /var/run/net-{{up_link}}.conf
+    # - /var/run/netplan/{{up_link}}.yaml
+    - /etc/systemd/network/05-{{up_link}}.network
+    - /etc/systemd/network/05-{{priv_link|d('')}}.network
+    - /etc/netplan/00-installer-config.yaml
+    - /etc/netplan/02-vlan.yaml
+  ignore_errors: true
+
+- name: netplan for hetzner dedicated
+  import_tasks: hetzner_robot.yaml
+  when: "'hetzner_robot' in group_names"
+
+- name: netplan for equinix
+  import_tasks: equinix.yaml
+  when: "'equinix' in group_names"
+
+- name: Configure netplan | Apply
+  command: "netplan generate"
+
+- name: enable network-manager
+  systemd:
+    enabled: yes
+    name: NetworkManager
+    state: started
+
+- name: disable systemd-networkd
+  systemd:
+    enabled: no
+    name: systemd-networkd
+    state: stopped
+
+- name: disable systemd-networkd
+  systemd:
+    enabled: no
+    name: systemd-networkd.socket
+    state: stopped
+
+- name: Configure netplan | Apply
+  command: "netplan apply"

@@ -1,0 +1,29 @@
+- name: create partitions
+  community.general.parted:
+    device: "{{item}}"
+    number: 1
+    label: gpt
+    state: absent
+  loop: "{{lvm_drives[0].drives}}"
+  when: reset == "confirmed"
+  ignore_errors: true
+
+- name: create partitions
+  community.general.parted:
+    device: "{{item}}"
+    number: 1
+    label: gpt
+    part_end: 100%
+    state: present
+  loop: "{{lvm_drives[0].drives}}"
+
+- name: create raid1 lvm for hostpath k8s
+  import_tasks: create_lvm.yaml
+  vars:
+    pvs: "{{lvm_drives[0].pvs}}"
+    vg: "{{lvm_drives[0].vg}}"
+    vgsize: 100%VG
+    vgopts:  --mirrors 1 --type raid1 --nosync
+    lv: data
+    name: data
+    lvfs: ext4

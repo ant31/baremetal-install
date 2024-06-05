@@ -1,0 +1,7 @@
+---
+
+- name: PIP | Install PIP packages
+  pip: name={{item}} state=present version={{item.version|default(omit)}}
+  with_items: "{{pip_packages}}"
+  tags:
+    - pip

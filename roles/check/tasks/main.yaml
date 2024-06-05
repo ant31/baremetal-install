@@ -1,0 +1,86 @@
+- name: prepare facts
+  ansible.builtin.set_fact:
+    info_keys:
+      - name
+      - id
+      - hostname
+      - datacenter
+      - model
+      - option
+      - processor
+      - vcpu
+      - ram
+      - ip
+      - priv_ip
+      - group
+      - nic
+      - drives
+      - os
+      - kernel
+      - partitions
+      - status
+
+    info:
+      name: "{{name}}"
+      id: "{{server_info['id']}}"
+      hostname: "{{hostname}}"
+      datacenter: "{{server_info['hetzner']['datacenter']}}"
+      model: "{{server_info['hetzner']['product']}}"
+      option: "{{model}}"
+      processor: "{{ansible_facts['processor'][2]}}"
+      vcpu: "{{ansible_facts['processor_vcpus']}}"
+      ip: "{{ansible_ssh_host}}"
+      ipv6: "{{ansible_facts['default_ipv6']['address']}}"
+      priv_ip: "{{ip}}"
+      group: "{{server_info['group']}}"
+      ram: "{{ansible_facts['memory_mb']['real']['total']}}"
+      os: "{{ansible_facts['lsb']['description']}}"
+      kernel: "{{ansible_facts['kernel']}}"
+      status: "ok"
+      nic: >-
+        {%- set _d = [] -%}
+        {%- for i in ansible_facts['interfaces'] -%}
+        {%- if i != 'lo' -%}
+        {%- if i in ansible_facts and 'module' in ansible_facts[i] and ansible_facts[i]['module'] == 'ixgbe' -%}
+        {%- set _tmp = _d.append('10G') -%}
+        {%- else -%}
+        {%- set _tmp = _d.append('1G') -%}
+        {%- endif -%}
+        {%- endif -%}
+        {%- endfor -%}
+        {%- for k in _d|sort -%}{{k}}{%- if not loop.last %},{% else %}{%- endif -%}{%- endfor -%}
+
+
+      drives: >-
+        {%- set _d = {} -%}
+        {% for i in ansible_facts['device_links']['ids'] -%}
+        {%- if i.startswith("sd") -%}
+        {%- set _tmp = _d.update({i[0:3]: True}) -%}
+        {%- elif i.startswith("nvme") -%}
+        {%- set _tmp = _d.update({i[0:5]: True}) -%}
+        {%- endif -%}
+        {%- endfor -%}
+        {%- for k in _d|dictsort -%}{{k[0]}}{%- if not loop.last %},{% else %}{%- endif -%}{%- endfor -%}
+      partitions: >-
+        {%- set _d = {} -%}
+        {% for i in ansible_facts['device_links']['ids'] -%}
+        {%- set _tmp = _d.update({i: True}) -%}
+        {%- endfor -%}
+        {%- for k in _d|dictsort -%}{{k[0]}}{%- if not loop.last %},{% else %}{%- endif -%}{%- endfor -%}
+
+- name: render-csv
+  run_once: true
+  delegate_to: localhost
+  connection: local
+  become: false
+  template:
+    src: hosts.csv.j2
+    dest: /tmp/hetzner-hosts.csv
+
+- name: "(todo) upload csv"
+  run_once: true
+  delegate_to: localhost
+  connection: local
+  debug:
+    msg:
+      - "not implemented yet"

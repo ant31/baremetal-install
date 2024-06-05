@@ -1,0 +1,5 @@
+- name: install hosts
+  hosts: all
+  gather_facts: false
+  tasks:
+    - command: "cat /etc/ferm/ferm.conf"

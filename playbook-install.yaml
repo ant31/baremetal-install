@@ -1,0 +1,30 @@
+---
+- name: install hosts dedicated
+  hosts: all
+  strategy: free
+  gather_facts: true
+  roles:
+    - role: os-config/ssh-auth
+      tags: ssh-auth
+    - role: os-config/ubuntu-release-upgrade
+      when: release_upgrade|d(false)|bool
+      tags: release-upgrade
+    - role: os-config/apt
+      tags: apt
+    - role: os-config/tuned
+      tags: tuned
+    - role: os-config/netplan
+      tags: netplan
+    - role: os-config/lvm
+      tags: lvm
+      when: prep_lvm|d(false)|bool
+    - role: os-config/ferm-firewall
+      tags: ferm
+    - role: os-config/emacs-conf
+      tags: emacs
+    - role: os-config/zsh-conf
+      tags: zsh
+    - role: os-config/system-conf
+      tags: system-conf
+    - role: reboot
+      tags: reboot

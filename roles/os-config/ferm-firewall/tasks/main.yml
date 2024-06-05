@@ -1,0 +1,49 @@
+---
+# This Playbook configure firewall 'ferm'
+- name: Ferm | Display rules var
+  debug:
+    msg: "{{ferm_rules}}"
+  tags:
+    - ferm
+
+- name: Ferm | Make sure ferm is installed
+  apt: name=ferm state=present
+  tags:
+   - ferm
+
+- name: Ferm | Make sure the directory for firewall rules exist
+  file: path=/etc/ferm state=directory owner=root group=root
+  tags:
+   - ferm
+
+- name: Ferm | Create config directory
+  file: path=/etc/ferm/ferm.d state=directory owner=root group=root
+  tags:
+   - ferm
+
+- name: Ferm | Include ferm.d directory
+  replace:
+    path: /etc/ferm/ferm.conf
+    regexp: "^@include 'ferm.d/';"
+    backup: no
+    before: "domain"
+  tags:
+    - ferm
+    - debug
+
+- name: Ferm | Create the ferm conf files
+  template: src=ferm.conf.j2 dest=/etc/ferm/ferm.d/{{item.key}}.conf mode=0655 owner=root group=root backup=no
+  with_dict: "{{ferm_rules}}"
+  tags:
+   - ferm
+  notify:
+    - reload ferm
+
+
+- meta: flush_handlers
+
+- name: reload ferm
+  service: name=ferm state=restarted
+  changed_when: False
+  tags:
+    - ferm

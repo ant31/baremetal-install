@@ -1,0 +1,101 @@
+- name: create lvm volume group
+  community.general.lvg:
+    vg: "{{vg}}"
+    pvs: "{{ pvs }}"
+
+- name: sleep 10
+  command: "sleep 10"
+  changed_when: False
+
+- name: create lvm volume in raid1
+  community.general.lvol:
+    vg: "{{vg}}"
+    size: "{{vgsize}}"
+    opts: "{{vgopts}}"
+    lv:  "{{lv}}"
+  ignore_errors: true
+
+- name: sleep 10
+  command: "sleep 10"
+  changed_when: False
+
+### ENCRYPTION
+- name: vault directory
+  file:
+    state: directory
+    path: /vault
+    mode: 0700
+    owner: root
+  when: encrypted_lvm |default(false) | bool == true
+
+- name: copy keyfile
+  copy:
+    src: data.secret.key
+    dest: /vault/data.key
+  when: encrypted_lvm |default(false) | bool == true
+
+- name: Create the luks container on top of the LVM
+  community.crypto.luks_device:
+    device: "/dev/{{vg}}/{{lv}}"
+    state: "opened"
+    name: luks-{{name}}
+    type: luks2
+    keyfile: /vault/data.key
+  when: encrypted_lvm |default(false) | bool == true
+
+- name: Add luks backup passphrase
+  community.crypto.luks_device:
+    device: "/dev/{{vg}}/{{lv}}"
+    state: "present"
+    name: luks-{{name}}
+    type: luks2
+    keyfile: /vault/data.key
+    new_passphrase: "{{cryptdata_pass}}"
+  when: encrypted_lvm |default(false) | bool == true
+
+- name: Create a ext4 filesystem on /dev/mapper/data and check disk blocks
+  community.general.filesystem:
+    fstype: ext4
+    dev: /dev/mapper/luks-{{name}}
+  when:
+    - encrypted_lvm |default(false) | bool == true
+    - lvfs == 'ext4'
+
+- name: Auto decrypt on boot the data volume
+  community.general.crypttab:
+    name: /dev/mapper/luks-{{name}}
+    backing_device: /dev/{{vg}}/{{lv}}
+    state: present
+    password: /vault/data.key
+    opts: luks,discard,nofail,timeout=30s
+  when: encrypted_lvm |default(false) | bool == true
+
+- name: Automount data
+  ansible.posix.mount:
+    path: /{{name}}
+    src: /dev/mapper/luks-{{name}}
+    fstype: ext4
+    state: mounted
+  when:
+    - lvfs == 'ext4'
+    - encrypted_lvm |default(false) | bool == true
+
+### END ENCRYPTION
+###
+- name: Create a ext4 filesystem on /dev/mapper/data and check disk blocks
+  community.general.filesystem:
+    fstype: ext4
+    dev: /dev/mapper/{{vg}}-{{name}}
+  when:
+    - encrypted_lvm |default(false) | bool == false
+    - lvfs == 'ext4'
+
+- name: Automount data
+  ansible.posix.mount:
+    path: /{{name}}
+    src: /dev/mapper/{{vg}}-{{name}}
+    fstype: ext4
+    state: mounted
+  when:
+    - lvfs == 'ext4'
+    - encrypted_lvm |default(false) | bool == false

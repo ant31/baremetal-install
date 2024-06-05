@@ -1,0 +1,8 @@
+---
+ansible_python_interpreter: /usr/bin/python3
+proxy_env: {}
+local_release_dir: "/tmp/releases"
+admin_user: "kadmin"
+ansible_ssh_user: "{{ admin_user }}"
+ansible_sudo_pass: "{{admin_password}}"
+ansible_become_password: "{{admin_password}}"

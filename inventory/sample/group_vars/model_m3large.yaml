@@ -1,0 +1,7 @@
+lvm_drives:
+  - vg: vgdata
+    size: 3840755982336B
+    pvs: /dev/nvme0n1p1,/dev/nvme1n1p1
+    drives:
+      - /dev/nvme0n1
+      - /dev/nvme1n1

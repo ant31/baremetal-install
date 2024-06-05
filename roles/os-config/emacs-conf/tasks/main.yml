@@ -1,0 +1,22 @@
+---
+
+- name: Emacs-conf | Site-level emacsrc configuration
+  copy: src=emacs.prod dest=/etc/emacs/emacs.rc backup=yes
+  tags:
+   - emacs-conf
+
+- name: Emacs-conf | user .emacs configuration
+  copy: "src=emacs.prod dest=/{{item}}/.emacs backup=yes"
+  loop:
+    - root
+    - home/{{admin_user | default("kadmin")}}
+  tags:
+   - emacs-conf
+
+- name: Emacs-conf | Site-level emacs.d configuration
+  unarchive:
+    src: emacs.d.tar.gz
+    dest: /etc/emacs/
+    remote_src: no
+  tags:
+   - emacs-conf

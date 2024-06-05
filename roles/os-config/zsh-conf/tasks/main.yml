@@ -1,0 +1,18 @@
+---
+- name: ZSH-conf | Copy site-level zsh.d
+  unarchive:
+    src: zsh.d.tar.gz
+    dest: /etc/zsh
+    remote_src: no
+  tags:
+   - zsh-conf
+
+- name: ZSH-conf | Copy newuser.zshrc.recommended
+  copy: src=newuser.zshrc.recommended dest=/etc/zsh backup=yes
+  tags:
+    - zsh-conf
+
+- name: ZSH-conf | Copy .zshrc for root user
+  copy: src=newuser.zshrc.recommended dest=/root/.zshrc backup=yes
+  tags:
+    - zsh-conf

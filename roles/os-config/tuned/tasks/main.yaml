@@ -1,0 +1,16 @@
+- name: install tuned
+  apt:
+    package:
+      - tuned
+      - tuned-utils
+      - tuned-utils-systemtap
+    state: latest
+  register: updated
+  tags:
+    - tuned
+
+- name: activate tuned
+  command: 'tuned-adm profile network-latency'
+  changed_when: False
+  tags:
+    - tuned

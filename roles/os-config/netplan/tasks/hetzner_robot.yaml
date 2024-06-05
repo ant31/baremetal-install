@@ -1,0 +1,22 @@
+
+- name: Configure netplan | Add vlan
+  template:
+    src: ns.yaml.j2
+    dest: /etc/netplan/00-netcfg.yaml
+    backup: true
+  register: ns
+  when: "'hetzner_robot' in group_names"
+
+- name: Configure netplan | Add vlan
+  template:
+    src: priv.yaml.j2
+    dest: /etc/netplan/z2-netcfg.yaml
+    backup: true
+  register: priv
+  when: "'hetzner_robot' in group_names"
+
+- name: Configure netplan | Add vlan
+  command: 'mv /etc/netplan/01-netcfg.yaml /etc/netplan/z1-netcfg.yaml'
+  changed_when: False
+  ignore_errors: true
+  when: "'hetzner_robot' in group_names"

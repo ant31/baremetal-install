@@ -1,0 +1,42 @@
+pip_packages: []
+
+apt:
+  packages:
+#    - pciutils
+    - dnsutils
+    - zsh
+    - python3-apt
+    - parted
+    - apt-transport-https
+    - software-properties-common
+    - conntrack
+    - smartmontools
+    - tcpdump
+    - socat
+    - unzip
+    - net-tools
+    - fail2ban
+    - emacs-nox
+    - git
+    - traceroute
+    - tree
+    - htop
+    - vim
+    - rsync
+    - iperf3
+    - ssh-import-id
+    - python-is-python3
+    - python3-pip
+    - ncurses-term
+    - curl
+    - nmap
+    - bc
+    - curl
+    - ack-grep
+    - sshpass
+    - psutils
+    - locales
+    - mtr-tiny
+    - tuned
+    - tuned-utils
+    - tuned-utils-systemtap

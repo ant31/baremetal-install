@@ -1,0 +1,11 @@
+name;id;hostname;datacenter;model;option;processor;vcpu;ram;ip;ipv6;private_ip;group;nic;drives;os;kernel;partitions;status
+{% for item in groups['all'] %}
+{% if 'info' in hostvars[item] %}
+{% for k in hostvars[item]['info_keys'] %}
+{{hostvars[item]['info'][k]}}{% if not loop.last %};{% else %}{% endif %}
+{% endfor %}
+
+{% else %}
+{{item}};{{hostvars[item]['server_info']['id']}};{{hostvars[item]['hostname']}};{{hostvars[item]['server_info']['hetzner']['datacenter']}};{{hostvars[item]['server_info']['hetzner']['product']}};{{hostvars[item]['model']}};;;;{{hostvars[item]['ansible_ssh_host']}};{{hostvars[item]['ip']}};{{hostvars[item]['server_info']['group']}};;;;;FAILED
+{% endif %}
+{% endfor %}

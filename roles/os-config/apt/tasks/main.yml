@@ -1,0 +1,45 @@
+---
+- name: APT | Install PPA packages
+  apt:
+    package:
+    - python-software-properties
+    - software-properties-common
+    state: latest
+    update_cache: yes
+    cache_valid_time: 3600
+  when: apt.repos is defined
+  tags:
+    - apt
+
+- name: APT | Add repositories
+  apt_repository: repo="{{item}}"
+  with_items: "{{apt.repos}}"
+  when: apt.repos is defined
+  tags:
+    - apt
+- name: packages
+  debug:
+    msg: "{{apt.packages}}"
+
+- name: APT | Install packages list
+  apt:
+    package: "{{apt.packages}}"
+    state: latest
+    update_cache: yes
+  register: updated
+  tags:
+    - apt
+
+- name: APT | Install packages list
+  apt:
+    upgrade: dist
+  register: dist
+  tags:
+    - apt
+
+- name: Reboot a slow machine that might have lots of updates to apply
+  reboot:
+    reboot_timeout: 300
+    test_command: date
+  register: rebooted
+  when: (reboot|d("never")=="always") or ((dist is changed or updated is changed) and (reboot is defined and reboot|d("never")=="onchange"))
