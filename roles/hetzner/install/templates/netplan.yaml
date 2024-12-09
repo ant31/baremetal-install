@@ -1,0 +1,31 @@
+network:
+{% if priv_link is defined %}
+  ethernets:
+    {{priv_link}}:
+      mtu: {{priv_mtu}}
+      match:
+         macaddress: {{ansible_facts[priv_link].macaddress}}
+{% endif %}
+  vlans:
+      {{up_link}}.{{vlan_id}}
+      id: {{vlan_id}}
+      link: {{up_link}}
+      mtu: {{vlan_mtu|d(1400)}}
+
+  bonds:
+    bond0:
+       mtu: {{vlan_mtu|d(1400)}}
+       addresses:
+         - {{ip}}/23
+       interfaces:
+         - {{priv_link}}
+         - {{up_link}}.{{vlan_id}}
+       routes:
+        - to: "192.168.128.0/17"
+          via: "192.168.0.1"
+       parameters:
+         mode: active-backup
+         mii-monitor-interval: 1
+         min-links: 1
+         primary: {{up_link}}.{{vland_id}}
+         #primary: {{priv_link}}

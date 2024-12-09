@@ -1,0 +1,14 @@
+DRIVE1 /dev/nvme0n1
+DRIVE2 /dev/nvme1n1
+SWRAID 1
+SWRAIDLEVEL 1
+HOSTNAME {{hostname}}
+PART /boot  ext4      4G
+PART /boot/efi esp 256M
+PART lvm vg0 all crypt
+CRYPTPASSWORD {{cryptroot_pass}}
+LV  vg0  swap  swap  swap   4G
+LV vg0   root   /     ext4  256G
+LV vg0   data   /data ext4  all
+IMAGE /root/images/{{os_image}}
+SSHKEYS_URL /root/authorized_keys

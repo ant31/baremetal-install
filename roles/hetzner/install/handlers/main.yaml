@@ -1,0 +1,2 @@
+- name: reboot-decrypt
+  shell: "echo {{cryptroot_pass}} | cryptroot-unlock"

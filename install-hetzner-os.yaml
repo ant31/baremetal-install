@@ -1,0 +1,6 @@
+- name: init
+  gather_facts: true
+  strategy: free
+  hosts: status_inrescue
+  roles:
+    - name: hetzner/install

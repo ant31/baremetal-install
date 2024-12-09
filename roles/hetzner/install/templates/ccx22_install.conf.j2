@@ -1,0 +1,9 @@
+DRIVE1 /dev/sda
+HOSTNAME {{hostname}}
+PART /boot  ext4      4G
+PART swap   swap      2G
+PART lvm vg0 all crypt
+CRYPTPASSWORD {{cryptroot_pass}}
+LV vg0   root   /     ext4          all
+IMAGE /root/images/{{os_image}}
+SSHKEYS_URL /root/authorized_keys

@@ -1,0 +1,11 @@
+- name: Set authorized keys taken from url
+  authorized_key:
+    manage_dir: false
+    state: present
+    key: https://github.com/{{item.github}}.keys
+    user: "{{item.user}}"
+    path: /etc/dropbear-initramfs/authorized_keys
+  loop: "{{sshkeys_dropbear | d({})}}"
+  when: item.github is defined and item.github is not none
+  tags:
+    - dropbear

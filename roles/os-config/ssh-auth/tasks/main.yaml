@@ -24,7 +24,7 @@
   tags:
     - sshkeys
 
-- name: Set authorized keys taken from url
+- name: Configure sshd: No password login/No root login
   lineinfile:
     backup: yes
     create: no
@@ -35,6 +35,18 @@
   loop:
     - { key: "PermitRootLogin", value: "no" }
     - { key: "PasswordAuthentication", value: "no" }
+  notify:
+    - restart sshd
+    
+- name: Configure sshd
+  lineinfile:
+    backup: yes
+    create: no
+    regex: "^(# *)?{{item.key}}"
+    line: "{{item.key}} {{item.value}}"
+    state: present
+    path: "/etc/ssh/sshd_config"
+  loop: "{{sshd_config}}"
   notify:
     - restart sshd
 

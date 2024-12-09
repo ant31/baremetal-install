@@ -1,0 +1,26 @@
+- name: prepare installimage conf
+  template:
+    src: "{{model}}_install.conf.j2"
+    dest: /root/install.conf
+
+- name: prepare authorized_keys
+  template:
+    src: authorized_keys.j2
+    dest: /root/authorized_keys
+
+- name: prepare post-install.sh
+  template:
+    src: post-install.sh.j2
+    dest: /root/post-install.sh
+    mode: 0755
+
+- name: install
+  command: /root/.oldroot/nfs/install/installimage -a -c /root/install.conf -x /root/post-install.sh
+  register: installation
+
+- name: reboot
+  reboot:
+    reboot_timeout: 300
+    test_command: date
+  when: installation is succeeded
+  register: rebooted

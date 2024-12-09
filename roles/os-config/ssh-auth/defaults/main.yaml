@@ -1,0 +1,7 @@
+sshd_config:
+  - { key: "PermitRootLogin", value: "no" }
+  - { key: "PasswordAuthentication", value: "no" }
+  - { key: "PermitTunnel", value: "yes" }
+  - { key: "X11DisplayOffset", value: "10" }
+  - { key: "AllowAgentForwarding", value: "yes" }
+  - { key: "AllowTcpForwarding", value: "yes" }

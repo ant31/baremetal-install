@@ -6,6 +6,8 @@
   roles:
     - role: os-config/ssh-auth
       tags: ssh-auth
+    - role: os-config/dropbear
+      tags: dropbear
     - role: os-config/ubuntu-release-upgrade
       when: release_upgrade|d(false)|bool
       tags: release-upgrade

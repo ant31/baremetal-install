@@ -1,0 +1,4 @@
+os_image: Ubuntu-2404-noble-amd64-base.tar.gz
+authorization_keys:
+  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKZhkK0VcyDElhj5W0tK/5LazgiUald3DdL1VXAgQTfq 2t.antoine+wsl2021@gmail.com
+  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGnQ6B+SZQHNmGVaJTfHPC5VZpNreo05e4PU7gN4YSif ec@lza.sh

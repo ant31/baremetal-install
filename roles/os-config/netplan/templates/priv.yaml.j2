@@ -7,7 +7,7 @@ network:
       dhcp6: false
       match:
         macaddress: {{up_link_mac}}
-
+{% if vlan_id is defined and vlan_id is not none and vlan_id > 0 %}
   vlans:
     vlan{{vlan_id}}:
       id: {{vlan_id}}
@@ -21,4 +21,5 @@ network:
         - to: {{route.to}}
           via: {{route.via}}
 {% endfor %}
+{% endif %}
 {% endif %}

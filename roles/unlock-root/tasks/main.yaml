@@ -1,0 +1,54 @@
+- name: check ssh server version (cloud network)
+  shell: "echo '' | nc -w 2 {{ip|d(ansible_ssh_host)}} 22"
+  vars:
+    ansible_connection: local
+  register: ssh_server_private_ip
+  when:
+    - ip is defined and ip is not none
+  changed_when: False
+  ignore_errors: true
+
+- name: check ssh server version (public_ip)
+  when:
+    - |-
+        (ssh_server_private_ip is not succeeded or
+          ssh_server_private_ip is skipped)
+  shell: "echo '' | nc -w 2 {{ansible_ssh_host}} 22"
+  vars:
+    ansible_connection: local
+  register: ssh_server
+  changed_when: False
+
+- name: unlock cloud servers | it's is dropbear
+  raw: "echo -n {{cryptroot_pass}} | cryptroot-unlock"
+  when:
+    - ssh_server_private_ip is succeeded
+    - ssh_server_private_ip is not skipped
+    - '"dropbear" in ssh_server_private_ip.stdout'
+  vars:
+    ansible_ssh_user: root
+    ansible_user: root
+    ansible_ssh_host: "{{ip}}"
+  register: unlock
+
+- name: unlock server | it's is dropbear
+  raw: "echo -n {{cryptroot_pass}} | cryptroot-unlock"
+  when:
+    - |-
+        (ssh_server_private_ip is not succeeded or
+          ssh_server_private_ip is skipped)
+    - "'dropbear' in ssh_server.stdout"
+  vars:
+    ansible_ssh_user: root
+    ansible_user: root
+  register: unlock
+
+- name: Wait 60 seconds for port 22 to become open and contain "OpenSSH"
+  wait_for:
+    port: 22
+    host: "{{ ansible_ssh_host }}"
+    delay: 10
+    timeout: 60
+  vars:
+    ansible_connection: local
+  when: unlock.changed

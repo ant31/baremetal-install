@@ -1,0 +1,14 @@
+- name: Install when in rescue and in group inrescue
+  include_tasks: "010_install_os.yaml"
+  # when:
+  #   - ansible_facts['distribution'] != "Ubuntu" and not protected
+
+- name: setname
+  connection: local
+  delegate_to: localhost
+  command: hetznerctl set-name {{ansible_ssh_host}} {{hostname}}
+  when:
+    - "'hetzner_robot' in group_names"
+    - server_info['hetzner']['current_name'] != hostname
+  tags:
+    - setname

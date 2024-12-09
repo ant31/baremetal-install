@@ -1,8 +1,10 @@
-INVENTORY ?= inventory/kubespray
-ADMIN=kadmin
+INVENTORY ?= inventory/al/
+ADMIN=ant31
 update-inventory:
 	echo "TODO generate inventory from equinix API"
 
+install-new-servers:
+	ansible-playbook -i $(INVENTORY) install-os.yaml  -e ansible_ssh_user=root -u root -l status_inrescue $(EXTRA)
 
 configure-new-servers-ssh:
 	ansible-playbook -i $(INVENTORY)  playbook-install.yaml -u root -e ansible_ssh_user=root -e reboot=no -l status_inrescue -e release_upgrade=false -t ssh-auth  $(EXTRA)
