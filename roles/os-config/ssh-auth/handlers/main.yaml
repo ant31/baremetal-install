@@ -1,4 +1,4 @@
-- name: restart sshd
+- name: restart ssh
   systemd:
     state: restarted
     name: sshd

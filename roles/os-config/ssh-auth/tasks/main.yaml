@@ -24,7 +24,7 @@
   tags:
     - sshkeys
 
-- name: Configure sshd: No password login/No root login
+- name: "Configure sshd: No password login/No root login"
   lineinfile:
     backup: yes
     create: no
@@ -37,6 +37,7 @@
     - { key: "PasswordAuthentication", value: "no" }
   notify:
     - restart sshd
+    - restart ssh
     
 - name: Configure sshd
   lineinfile:
@@ -49,7 +50,7 @@
   loop: "{{sshd_config}}"
   notify:
     - restart sshd
-
+    - restart ssh
 - name: restart sshd
   command: systemctl restart sshd
   when: restart_sshd|d(false)|bool
