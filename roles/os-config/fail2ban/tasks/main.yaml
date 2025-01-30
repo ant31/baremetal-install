@@ -1,0 +1,16 @@
+- name: install fail2ban
+  apt:
+    package:
+      - fail2ban
+    state: latest
+  register: fail2ban_up
+  tags:
+    - fail2ban
+
+- name: enable fail2ban
+  ansible.builtin.systemd_service:
+    enabled: true
+    name: fail2ban
+    state: started
+  tags:
+    - fail2ban

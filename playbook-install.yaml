@@ -13,6 +13,8 @@
       tags: release-upgrade
     - role: os-config/apt
       tags: apt
+    - role: hetzner/os-config/fail2ban
+      tags: fail2ban
     - role: os-config/tuned
       tags: tuned
     - role: os-config/netplan

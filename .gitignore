@@ -3,7 +3,7 @@
 # *.secrets.*
 # **/secrets/**
 # **/secret/**
-
+mise*.toml
 __pycache__/
 *.py[cod]
 *$py.class
