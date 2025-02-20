@@ -6,14 +6,14 @@
   roles:
     - role: os-config/ssh-auth
       tags: ssh-auth
-    - role: os-config/dropbear
-      tags: dropbear
+    # - role: os-config/dropbear
+    #   tags: dropbear
     - role: os-config/ubuntu-release-upgrade
       when: release_upgrade|d(false)|bool
       tags: release-upgrade
     - role: os-config/apt
       tags: apt
-    - role: hetzner/os-config/fail2ban
+    - role: os-config/fail2ban
       tags: fail2ban
     - role: os-config/tuned
       tags: tuned

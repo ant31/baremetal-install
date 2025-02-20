@@ -1,13 +1,15 @@
 INVENTORY ?= inventory/al/
 ADMIN=ant31
+INITIAL_USER=root
+
 update-inventory:
 	echo "TODO generate inventory from equinix API"
 
 install-new-servers:
-	ansible-playbook -i $(INVENTORY) install-os.yaml  -e ansible_ssh_user=root -u root -l status_inrescue $(EXTRA)
+	ansible-playbook -i $(INVENTORY) install-os.yaml  -e ansible_ssh_user=$(INITIAL_USER) -u root -l status_inrescue $(EXTRA)
 
 configure-new-servers-ssh:
-	ansible-playbook -i $(INVENTORY)  playbook-install.yaml -u root -e ansible_ssh_user=root -e reboot=no -l status_inrescue -e release_upgrade=false -t ssh-auth  $(EXTRA)
+	ansible-playbook -i $(INVENTORY)  playbook-install.yaml -u root -e ansible_ssh_user=$(INITIAL_USER) -e reboot=no -l status_inrescue -e release_upgrade=false --become --become-user=root -t ssh-auth  $(EXTRA)
 
 configure-new-servers:
 	ansible-playbook -i $(INVENTORY)  playbook-install.yaml --become --become-user=root -u $(ADMIN) -e ansible_ssh_user=$(ADMIN) -e reboot=no -l status_inrescue -e release_upgrade=false -vv $(EXTRA)
