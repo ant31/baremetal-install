@@ -1,0 +1,14 @@
+- name: Remove a line blocking all connection
+  ansible.builtin.lineinfile:
+    path: /etc/iptables/rules.v4
+    regexp: "{{item[0]}}"
+    line: "{{item[1]}}"
+  when: "'oci' in group_names"
+  loop:
+    - ['^-A FORWARD -j REJECT --reject-with icmp-host-prohibited',  "-A INPUT -j ACCEPT"]
+    - ['^-A INPUT -j REJECT --reject-with icmp-host-prohibited', "-A INPUT -j ACCEPT"]
+
+- name: Remove a line blocking all connection
+  shell: "iptables-restore < /etc/iptables/rules.v4"
+  changed_when: false
+  when: "'oci' in group_names"

@@ -1,0 +1,6 @@
+- name: Configure netplan | Add vlan
+  template:
+    src: oci.yaml.j2
+    dest: /etc/netplan/z1-vlan-netcfg.yaml
+    backup: true
+  when: "'oci' in group_names"

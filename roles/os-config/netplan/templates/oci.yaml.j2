@@ -1,0 +1,8 @@
+network:
+  vlans:
+    vlan{{vlan_id}}:
+      id: {{vlan_id}}
+      link: {{up_link}}
+      mtu: {{vlan_mtu|d(9000)}}
+      addresses:
+         - {{ip_vlan}}/{{ip_vlan_range|default(24)|int}}

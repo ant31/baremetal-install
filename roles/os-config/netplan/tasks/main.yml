@@ -26,6 +26,10 @@
   import_tasks: equinix.yaml
   when: "'equinix' in group_names"
 
+- name: netplan for oci
+  import_tasks: oci.yaml
+  when: "'oci' in group_names"
+
 - name: Configure netplan | Apply
   command: "netplan generate"
 
@@ -34,18 +38,21 @@
     enabled: yes
     name: NetworkManager
     state: started
+  when: "'oci' not in group_names"
 
 - name: disable systemd-networkd
   systemd:
     enabled: no
     name: systemd-networkd
     state: stopped
+  when: "'oci' not in group_names"
 
 - name: disable systemd-networkd
   systemd:
     enabled: no
     name: systemd-networkd.socket
     state: stopped
+  when: "'oci' not in group_names"
 
 - name: Configure netplan | Apply
   command: "netplan apply"

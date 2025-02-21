@@ -23,7 +23,7 @@
     pvs: "{{lvm_drives[0].pvs}}"
     vg: "{{lvm_drives[0].vg}}"
     vgsize: 100%VG
-    vgopts:  --mirrors 1 --type raid1 --nosync
+    vgopts: "{{lvm_drives[0].vgopts | d('--mirrors 1 --type raid1 --nosync')}}"
     lv: data
     name: data
     lvfs: ext4
