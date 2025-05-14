@@ -16,6 +16,6 @@ RUN echo '*.secret.* filter=git-crypt diff=git-crypt\n\
 **/secrets/** filter=git-crypt diff=git-crypt\n\
 **/secret/** filter=git-crypt diff=git-crypt\n\
 .gitattributes !filter !diff\n' > /app/.gitattributes
-RUN git config --global user.email "al@conny.de" && \
+RUN git config --global user.email "2t.antoine@gmail.com" && \
     git config --global user.name "Antoine L" && \
     git init && git add . && git commit -m "Initial commit"
